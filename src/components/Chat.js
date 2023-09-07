@@ -45,24 +45,27 @@ const Chat = () => {
   }));
 
   return (
-    <Container style={{background:' radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(242,235,245,1) 46%, rgba(200,177,220,1) 100%)'}}>
+    <Container style={{background:'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(242,235,245,1) 46%, rgba(200,177,220,0.7177844101123596) 100%)'}}>
       <Grid container
         justifyContent={"center"}
         style={{height: window.innerHeight - 50}}>
-          <div style={{width:'80%', height:'60vh', border:'3px solid purple',marginTop:"10px", overflowY:'auto', background:' radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(242,235,245,1) 46%, rgba(200,177,220,1) 100%)'}}>
+          <div style={{width:'80%', height:'60vh', border:'3px solid purple',marginTop:"10px", overflowY:'auto', background:'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(242,235,245,1) 46%, rgba(200,177,220,0.7177844101123596) 100%)'}}>
            {messagesArray.map((message) =>(
              <div style={{
              margin:'3px', 
-             border:'solid 1px purple',
              padding:"5px",
              marginLeft: user.uid === message.uid ? 'auto':'10px',
-             width:'fit-content'
+             width:'fit-content',
+             
              }} key={message.id}>
-              <Grid container>
-                  <Avatar style={{marginTop:'2px'}} src={message.photoURL}/>
-                  <div style={{marginLeft:'3px',marginTop:'10px'}}>{message.displayName }{ user.uid === message.uid ? ' (Вы)':''}</div>
-              </Grid>
-              <div>{message.text}</div>
+              <Grid  container style={{justifyContent:user.uid === message.uid ? 'flex-end': 'flex-start'}}>
+                
+                <Avatar style={{marginTop:'2px'}} src={message.photoURL}/>
+                  <div style={{marginLeft:'10px',marginTop:'14px'}}>{message.displayName }{ user.uid === message.uid ? ' (Вы)':''}</div>
+              
+                
+                  </Grid>
+              <div style={{marginLeft:'5px', marginTop:'4px', textAlign: user.uid === message.uid ? 'right' : 'left' }}>{message.text}</div>
              </div>
             ))}
           </div>
