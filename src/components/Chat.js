@@ -1,8 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useRef,useEffect  } from 'react';
 import { Context } from '..';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import {useCollection} from 'react-firebase-hooks/firestore';
-import { Avatar, Button, Container, Grid, TextField } from '@mui/material';
+import { Avatar, Container, Grid } from '@mui/material';
 import { collection, query, orderBy,addDoc  } from 'firebase/firestore';
 import Loader from './Loader';
 import { serverTimestamp } from 'firebase/firestore';
@@ -17,6 +17,9 @@ const Chat = () => {
   const messagesCollection = collection(firestore, 'messages');
   const messagesQuery = query(messagesCollection, orderBy('createdAt'));
   const [messages, loading] = useCollection(messagesQuery);  
+
+  const messagesContainerRef = useRef();//для автопрокрутки
+
 
   const sendMessage = async () => {
     try {
@@ -35,21 +38,43 @@ const Chat = () => {
   
     setValue('')
 
-  }
+  };
+
+
+  const messagesArray = messages ? messages.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })):[];
+ 
+ 
+     // useEffect для автопрокрутки до последнего сообщения
+  useEffect(() => {
+    if (messagesContainerRef.current){
+      messagesContainerRef.current.scrollTop =
+      messagesContainerRef.current.scrollHeight;
+    } 
+    
+  }, [messagesArray, messagesContainerRef]); // Зависимость от messagesArray
   if (loading){
     return <Loader/>
   }
-  const messagesArray = messages.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
 
   return (
-    <Container style={{background:'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(242,235,245,1) 46%, rgba(200,177,220,0.7177844101123596) 100%)'}}>
+    <div  style={{background:'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(242,235,245,1) 46%, rgba(200,177,220,0.7177844101123596) 100%)'}}>
+
+    <Container>
       <Grid container
         justifyContent={"center"}
         style={{height: window.innerHeight - 50}}>
-          <div style={{width:'80%', height:'60vh', border:'3px solid purple',marginTop:"10px", overflowY:'auto', background:'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(242,235,245,1) 46%, rgba(200,177,220,0.7177844101123596) 100%)'}}>
+          <div 
+           style={{
+           width:'80%', 
+           height:'60vh',
+           border:'3px solid purple',
+           marginTop:"10px",
+           overflowY:'auto'}}
+           ref={messagesContainerRef}
+           >
            {messagesArray.map((message) =>(
              <div style={{
              margin:'3px', 
@@ -65,32 +90,68 @@ const Chat = () => {
               
                 
                   </Grid>
-              <div style={{marginLeft:'5px', marginTop:'4px', textAlign: user.uid === message.uid ? 'right' : 'left' }}>{message.text}</div>
+              <div style={{
+               marginLeft:'5px',
+               marginTop:'4px',
+               textAlign: user.uid === message.uid ? 'right' : 'left',
+               maxWidth:'600px',
+               whiteSpace: 'pre-wrap',
+               wordWrap: 'break-word',
+                 }}>{message.text}</div>
              </div>
             ))}
           </div>
        
-          <Grid 
+           <Grid 
               container
               direction={'column'}
               alignItems={'flex-end'}
               style={{width:'80%'}}
-            >
-                <TextField
-                fullWidth
-                maxRows={2}
-                 color={"secondary"} variant='outlined'
-                 value={value}
-                 onChange={e => setValue(e.target.value)}
+            > 
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <input
+                type='text'
+               
+                value={value}
+                onChange={e => setValue(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    sendMessage();
+                    setValue('');
+                  }
+                }}
+                style={{width:'100%',
+                 minHeight: '40px',
+                 height: '40px',
+                 borderRadius: '5px',
+                 backgroundColor:'transparent',
+                 borderColor:'#5d3954',
+                              
+                }}
                 />
                 
-                <Button onClick={sendMessage} color={"secondary"} variant='outlined'>Отправить</Button>
+                <button
+                 onClick={sendMessage}
+                 style={{minHeight: '40px',
+                 height: '44px',
+                 marginLeft:'3px',
+                 paddingLeft:'10px',
+                 paddingRight:'10px',
+                 borderRadius: '5px',
+                 backgroundColor:'transparent',
+                 borderColor:'#5d3954' ,
+                             
+                }}
+                 >
+                 &#x25B6;
+                 </button>
+            </div>
+            </Grid> 
 
-                
-            </Grid>
         </Grid>
      
     </Container>
+    </div>
   );
 }
 

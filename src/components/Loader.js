@@ -3,6 +3,7 @@ import React from "react";
 
 const Loader = () => {
     return(
+      <div style={{background:'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(242,235,245,1) 46%, rgba(200,177,220,0.7177844101123596) 100%)'}}>
         <Container>
       <Grid container
         style={{height:window.innerHeight - 50}}
@@ -19,6 +20,8 @@ const Loader = () => {
          </Grid>
       </Grid>
      </Container>
+
+      </div>
     );
 };
 
